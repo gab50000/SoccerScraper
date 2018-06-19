@@ -5,7 +5,9 @@ import scrapy
 
 
 def find_lists(text):
-    return re.findall(r"\[[^\]]*\]", text)
+    return re.findall(r"""\[
+                             (?:[^\d\]+\d+(?:pen)?[\,\;]?\s*)+
+                          \]""", text, flags=re.VERBOSE)
 
 
 class MainSpider(scrapy.Spider):
@@ -17,7 +19,8 @@ class MainSpider(scrapy.Spider):
         links = response.xpath("//a/@href").extract()
 
         lists = find_lists(response.text)
-        yield {"lists": lists}
+        if lists:
+            yield {"lists": lists}
 
         for link in links:
             full_link = response.urljoin(link)
