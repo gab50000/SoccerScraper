@@ -4,10 +4,15 @@ import re
 import scrapy
 
 
+MONTHS = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split()
+
+
 def find_lists(text):
-    return re.findall(r"""\[
-                             (?:[^\d\]+\d+(?:pen)?[\,\;]?\s*)+
-                          \]""", text, flags=re.VERBOSE)
+    result = re.findall(r"""\[
+                              (?:[\w\s]+\d+(?:\+\d+)?(?:pen)?[\,\;]?\s*)+
+                            \]""", text, flags=re.VERBOSE)
+    return [r for r in result if not any(month in r.strip("[]").split()[0] for month in MONTHS)
+                                 and len(r) > 3]
 
 
 class MainSpider(scrapy.Spider):
